@@ -1,0 +1,35 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/Charity.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract DonationTracker {\n    struct Donation {\n        address donor;\n        uint amount;\n        uint timestamp;\n    }\n\n    mapping(address => Donation[]) public donations;\n\n    function donate() public payable {\n        require(msg.value > 0, \"Donation amount must be greater than 0\");\n        \n        donations[msg.sender].push(Donation({\n            donor: msg.sender,\n            amount: msg.value,\n            timestamp: block.timestamp\n        }));\n    }\n\n    function getTotalDonationByUser(address user) public view returns (uint) {\n        uint totalDonation = 0;\n        Donation[] memory userDonations = donations[user];\n        \n        for (uint i = 0; i < userDonations.length; i++) {\n            totalDonation += userDonations[i].amount;\n        }\n        \n        return totalDonation;\n    }\n\n    function getTotalDonation() public view returns (uint) {\n        uint totalDonation = 0;\n        address[] memory users = getAllUsers();\n        \n        for (uint i = 0; i < users.length; i++) {\n            totalDonation += getTotalDonationByUser(users[i]);\n        }\n        \n        return totalDonation;\n    }\n\n   function getAllUsers() public view returns (address[] memory) {\n    address[] memory users;\n    for (uint i = 0; i < msg.sender.balance; i++) {\n        if (donations[msg.sender][i].donor != address(0)) {\n            users[i] = donations[msg.sender][i].donor;\n        }\n    }\n    return users;\n}\n\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}
